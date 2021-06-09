@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankmarketing-prediction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bankmarketing-prediction
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: bankmarketing-prediction
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: bankmarketing-prediction
+        image: cis325registrydemofinal.azurecr.io/bankmarketingapi
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bankmarketing-prediction
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+  selector:
+    app: bankmarketing-prediction
